@@ -1,41 +1,60 @@
 ﻿using BenchmarkDotNet.Attributes;
 using System.Collections.Concurrent;
+using System.Security.Cryptography;
 
 namespace Benchmarks;
 
 [MemoryDiagnoser(false)]
-[BenchmarkCategory(new[] { "Tasks", "Parallelism", "Collections" })]
+[BenchmarkCategory(new[] { "Tasks", "Concurrency", "Parallelism", "Collections" })]
 public class TaskBenchmarks
 {
-    private static IEnumerable<Task<long>> Tasks => Enumerable.Range(0, 50).Select(_ =>
-        Task.Run(async () =>
-        {
-            var x = new Random().Next();
-            var y = Random.Shared.Next();
+    private const int _chunkSize = 4;
+    private const int _collectionSize = 100;
+    private const int _numberOfIterations = 1_000;
+    private const int _randomStart = 0;
+    private const int _randomEnd = 1_000_000;
+    private const int _delay = 50;
 
-            var z = DateTimeOffset.Now.ToUnixTimeMilliseconds();
+    private static IEnumerable<Task<int>> Tasks =>
+        Enumerable
+            .Range(0, _collectionSize)
+            .Select(async (_, index) =>
+            {
+                await Task.Delay(_delay);
 
-            await Task.Delay(50);
+                return await Task.Run(() =>
+                {
+                    var result = index;
 
-            return (x * y) + z;
-        })
-    );
+                    for (var i = 0; i < _numberOfIterations; i++)
+                    {
+                        var random = RandomNumberGenerator.GetInt32(_randomStart, _randomEnd);
+
+                        result =
+                            result <= random / 2
+                                ? result + i
+                                : random;
+                    }
+
+                    return result;
+                });
+            });
 
     [Benchmark]
     public async Task Foreach_Loop()
     {
-        foreach (var item in Tasks)
+        foreach (var task in Tasks)
         {
-            await item;
+            await task;
         }
     }
 
     [Benchmark]
     public async Task Async_Foreach_Loop()
     {
-        await foreach (var item in Tasks.ToAsyncEnumerable())
+        await foreach (var task in Tasks.ToAsyncEnumerable())
         {
-            await item;
+            await task;
         }
     }
 
@@ -43,20 +62,20 @@ public class TaskBenchmarks
     public async Task AsyncEnumerable()
     {
         await Tasks.ToAsyncEnumerable()
-            .SelectAwait(async x => await x)
+            .SelectAwait(async task => await task)
             .ToListAsync();
     }
 
     [Benchmark]
     public void ParallelForEach()
     {
-        Parallel.ForEach(Tasks, t => t.GetAwaiter().GetResult());
+        Parallel.ForEach(Tasks, task => task.GetAwaiter().GetResult());
     }
 
     [Benchmark]
     public async Task ParallelForEachAsync()
     {
-        await Parallel.ForEachAsync(Tasks, async (t, _) => await t);
+        await Parallel.ForEachAsync(Tasks, async (task, _) => await task);
     }
 
     [Benchmark]
@@ -66,36 +85,36 @@ public class TaskBenchmarks
     }
 
     [Benchmark]
-    public async Task WhenAll_with_Chunk_of_4_and_Foreach_Loop()
+    public async Task WhenAll_with_Chunk_and_Foreach_Loop()
     {
-        foreach (var partition in Tasks.Chunk(4))
+        foreach (var batchOfTasks in Tasks.Chunk(_chunkSize))
         {
-            await Task.WhenAll(partition);
+            await Task.WhenAll(batchOfTasks);
         }
     }
 
     [Benchmark]
-    public async Task WhenAll_with_GroupBy_Grouped_by_4_and_Foreach_Loop()
+    public async Task WhenAll_with_GroupBy_Grouped_by_ChunkSize_and_Foreach_Loop()
     {
-        foreach (var partition in Tasks.Select((t, i) => (t, i)).GroupBy(x => x.i % 4))
+        foreach (var batchOfTasks in Tasks.Select((task, index) => (task, index)).GroupBy(x => x.index / _chunkSize))
         {
-            await Task.WhenAll(partition.Select(x => x.t));
+            await Task.WhenAll(batchOfTasks.Select(x => x.task));
         }
     }
 
     [Benchmark]
-    public async Task WhenAll_with_AsParallel_and_DegreeOfParallelism_4()
+    public async Task WhenAll_with_AsParallel_and_DegreeOfParallelism_ChunkSize()
     {
         await Task.WhenAll(
             Tasks
                 .AsParallel()
-                .WithDegreeOfParallelism(4)
+                .WithDegreeOfParallelism(_chunkSize)
         );
     }
 
-    private static async Task<List<long>> EvaluatePartition(IEnumerator<Task<long>> partition)
+    private static async Task<List<int>> EvaluatePartition(IEnumerator<Task<int>> partition)
     {
-        var result = new List<long>();
+        var result = new List<int>();
 
         using (partition)
         {
@@ -109,35 +128,35 @@ public class TaskBenchmarks
     }
 
     [Benchmark]
-    public async Task WhenAll_with_Partitioner_and_Partitions_4()
+    public async Task WhenAll_with_Partitioner_and_Partitions_ChunkSize()
     {
         await Task.WhenAll(
             Partitioner
                 .Create(Tasks)
-                .GetPartitions(4)
+                .GetPartitions(_chunkSize)
                 .Select(EvaluatePartition)
         );
     }
 
     [Benchmark]
-    public async Task WhenAll_with_Partitioner_AsParallel_and_Partitions_4()
+    public async Task WhenAll_with_Partitioner_AsParallel_and_Partitions_ChunkSize()
     {
         await Task.WhenAll(
             Partitioner
                 .Create(Tasks)
-                .GetPartitions(4)
+                .GetPartitions(_chunkSize)
                 .AsParallel()
                 .Select(EvaluatePartition)
         );
     }
 
     [Benchmark]
-    public async Task AsyncEnumerable_with_GroupBy_Grouped_by_4_and_TaskWhenAll()
+    public async Task AsyncEnumerable_with_GroupBy_Grouped_by_ChunkSize_and_TaskWhenAll()
     {
         await Tasks.ToAsyncEnumerable()
-            .Select((t, i) => (t, i))
-            .GroupBy(x => x.i % 4)
-            .SelectAwait(async x => await Task.WhenAll(await x.Select(y => y.t).ToListAsync()))
+            .Select((task, index) => (task, index))
+            .GroupBy(x => x.index / _chunkSize)
+            .SelectAwait(async x => await Task.WhenAll(await x.Select(y => y.task).ToListAsync()))
             .ToListAsync();
     }
 }
