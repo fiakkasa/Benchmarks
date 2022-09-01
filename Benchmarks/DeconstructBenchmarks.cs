@@ -1,4 +1,5 @@
 ﻿using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Order;
 using Benchmarks.Interfaces;
 
 namespace Benchmarks.Objects;
@@ -51,10 +52,12 @@ public static class ExtDeconstructExtensions
 }
 
 [MemoryDiagnoser(false)]
+[RankColumn]
+[Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [BenchmarkCategory(new[] { "Objects", "Deconstruct" })]
 public class DeconstructBenchmarks : IBenchmark
 {
-    [Benchmark]
+    [Benchmark(Baseline = true)]
     public void Native_Deconstruct_Record()
     {
         var (Name, DateOfBirth, Weight) = new NativeDeconstruct(

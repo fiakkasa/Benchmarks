@@ -2,3 +2,9 @@
 
 # CA1822: Mark members as static
 dotnet_diagnostic.CA1822.severity = none
+
+# S1481: Unused local variables should be removed
+dotnet_diagnostic.S1481.severity = none
+
+# IDE0059: Unnecessary assignment of a value
+dotnet_diagnostic.IDE0059.severity = none
