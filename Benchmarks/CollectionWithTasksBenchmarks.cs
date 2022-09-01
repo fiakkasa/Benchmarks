@@ -1,12 +1,13 @@
 ﻿using BenchmarkDotNet.Attributes;
+using Benchmarks.Interfaces;
 using System.Collections.Concurrent;
 using System.Security.Cryptography;
 
-namespace Benchmarks;
+namespace Benchmarks.Collections;
 
 [MemoryDiagnoser(false)]
-[BenchmarkCategory(new[] { "Tasks", "Concurrency", "Parallelism", "Collections" })]
-public class TaskBenchmarks
+[BenchmarkCategory(new[] { "Collections", "Tasks", "Concurrency", "Parallelism" })]
+public class CollectionWithTasksBenchmarks : IBenchmark
 {
     private const int _chunkSize = 4;
     private const int _collectionSize = 10;
