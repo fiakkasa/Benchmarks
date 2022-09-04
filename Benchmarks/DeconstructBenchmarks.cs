@@ -90,6 +90,17 @@ public class DeconstructBenchmarks : IBenchmark
     }
 
     [Benchmark]
+    public void Extension_Deconstruct_Record_As_Method()
+    {
+        new ExtensionDeconstruct
+        {
+            Name = "John",
+            DateOfBirth = DateTimeOffset.Now,
+            Weight = 50D
+        }.Deconstruct(out var Name, out var DateOfBirth, out var Weight);
+    }
+
+    [Benchmark]
     public void Extension_Deconstruct_Class()
     {
         var (Name, DateOfBirth, Weight) = new ExtensionOfClassDeconstruct
@@ -101,9 +112,30 @@ public class DeconstructBenchmarks : IBenchmark
     }
 
     [Benchmark]
-    public void Tuple_Deconstruct()
+    public void Extension_Deconstruct_Class_As_Method()
+    {
+        new ExtensionOfClassDeconstruct
+        {
+            Name = "John",
+            DateOfBirth = DateTimeOffset.Now,
+            Weight = 50D
+        }.Deconstruct(out var Name, out var DateOfBirth, out var Weight);
+    }
+
+    [Benchmark]
+    public void Tuple_Deconstruct_Declared()
     {
         var (Name, DateOfBirth, Weight) = (
+            "John",
+            DateTimeOffset.Now,
+            50D
+        );
+    }
+
+    [Benchmark]
+    public void Tuple_Deconstruct_Assigned()
+    {
+        var (Name, DateOfBirth, Weight) = new Tuple<string?, DateTimeOffset, double>(
             "John",
             DateTimeOffset.Now,
             50D
