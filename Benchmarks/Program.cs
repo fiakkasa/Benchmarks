@@ -1,7 +1,5 @@
 ﻿using BenchmarkDotNet.Running;
-using Benchmarks.Interfaces;
 using System.Reflection;
-using System.Text;
 using static Benchmarks.Consts;
 
 var (collection, help) = Assets();

@@ -1,14 +1,9 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
-using Benchmarks.Interfaces;
-using System.Text;
-
-namespace Benchmarks.Scalars;
+﻿namespace Benchmarks.Strings;
 
 [MemoryDiagnoser(false)]
 [RankColumn]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Scalars", "StringConcatenation" })]
+[BenchmarkCategory(new[] { "Strings", "Scalars", "StringConcatenation" })]
 public class StringConcatenationBenchmarks : IBenchmark
 {
     private readonly string[] _collection = new[]
@@ -70,6 +65,12 @@ public class StringConcatenationBenchmarks : IBenchmark
     public string Concatenate_Using_String_Join()
     {
         return string.Join(string.Empty, _collection);
+    }
+
+    [Benchmark]
+    public string Concatenate_Using_String_Concat()
+    {
+        return string.Concat(_collection);
     }
 
     [Benchmark]

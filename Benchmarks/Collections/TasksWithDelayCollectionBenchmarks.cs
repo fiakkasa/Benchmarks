@@ -1,7 +1,4 @@
-﻿using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Order;
-using Benchmarks.Interfaces;
-using System.Collections.Concurrent;
+﻿using System.Collections.Concurrent;
 using System.Security.Cryptography;
 
 namespace Benchmarks.Collections;
@@ -11,19 +8,24 @@ namespace Benchmarks.Collections;
 [RankColumn]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
 [BenchmarkCategory(new[] { "Collections", "Tasks", "Concurrency", "Parallelism" })]
-public class TasksCollectionBenchmarks : IBenchmark
+public class TasksWithDelayCollectionBenchmarks : IBenchmark
 {
     private const int _chunkSize = 4;
     private const int _collectionSize = 10;
     private const int _numberOfIterations = 100;
     private const int _randomStart = 0;
     private const int _randomEnd = 1_000_000;
+    private const int _delay = 50;
 
     private static IEnumerable<Task<int>> Tasks =>
         Enumerable
             .Range(0, _collectionSize)
-            .Select((_, index) => UnitOfWork(index));
+            .Select(async (_, index) =>
+            {
+                await Task.Delay(_delay);
 
+                return await UnitOfWork(index);
+            });
     private static Task<int> UnitOfWork(int index) =>
         Task.Run(() =>
         {
