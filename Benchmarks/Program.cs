@@ -1,79 +1,23 @@
 ﻿using BenchmarkDotNet.Running;
-using Benchmarks;
 using Benchmarks.Interfaces;
 using System.Reflection;
-
-static (Type[] collection, string help) Assets()
-{
-    var collection =
-        Assembly
-            .GetEntryAssembly()!
-            .GetTypes()
-            .Where(x => !x.IsInterface && x.GetInterface(nameof(IBenchmark)) is { })
-            .ToArray();
-
-    var help =
-@$"Welcome to Benchmarks!
-
-Arguments
-----------
---help or -h : this help menu
---all or -a : runs all
---benchmark=<name_of_benchmark> or -b=<name_of_benchmark>: runs specific benchmark - multiple can specified
-
-Available Benchmarks
---------------------
-{string.Join(
-    Environment.NewLine,
-    collection.Select(x =>
-        x.Name[..x.Name.LastIndexOf(Consts.BenchmarkClassPostfix)]
-    )
-)}";
-
-    return (collection, help);
-}
-
-static void PrintHeader(string title, string help)
-{
-    Console.WriteLine(help);
-    Console.WriteLine(string.Empty);
-    Console.WriteLine("----------------------------------------------------------------");
-    Console.WriteLine(title);
-    Console.WriteLine("----------------------------------------------------------------");
-    Console.WriteLine(string.Empty);
-}
-
-static void RunBenchmarks(string title, string help, Type[] collection)
-{
-    PrintHeader(title, help);
-
-    BenchmarkRunner.Run(collection);
-}
+using System.Text;
+using static Benchmarks.Consts;
 
 var (collection, help) = Assets();
 
-if (args.Any(x => x == "-h" || x == "--help"))
-{
+if (args.Any(x => x == ArgumentPrefix + "h" || x == ArgumentLongPrefix + "help"))
     Console.WriteLine(help);
-}
 else if (collection.Length == 0)
-{
-    PrintHeader("No benchmark(s) registered", help);
-}
-else if (args.Any(x => x == "-a" || x == "--all"))
-{
-    RunBenchmarks(
-        "All benchmarks will commence promptly!",
-        help,
-        collection
-    );
-}
-else if (args.Any(x => x.StartsWith("-b" + Consts.ArgumentKeyValueSeparator) || x.StartsWith("--benchmark" + Consts.ArgumentKeyValueSeparator)))
+    PrintHeader(NoBenchmarksRegisteredMessage, help);
+else if (args.Any(x => x == ArgumentPrefix + "a" || x == ArgumentLongPrefix + "all"))
+    RunBenchmarks(AllBenchmarksMessage, help, collection);
+else if (args.Any(x => x.StartsWith(ArgumentPrefix + "b" + ArgumentKeyValueSeparator) || x.StartsWith(ArgumentLongPrefix + "benchmark" + ArgumentKeyValueSeparator)))
 {
     var runnable =
         args
-            .Where(x => x.StartsWith("-b" + Consts.ArgumentKeyValueSeparator) || x.StartsWith("--benchmark" + Consts.ArgumentKeyValueSeparator))
-            .Select(x => x.Split(Consts.ArgumentKeyValueSeparator).Skip(1).First().Trim() + Consts.BenchmarkClassPostfix)
+            .Where(x => x.StartsWith(ArgumentPrefix + "b" + ArgumentKeyValueSeparator) || x.StartsWith(ArgumentLongPrefix + "benchmark" + ArgumentKeyValueSeparator))
+            .Select(x => x.Split(ArgumentKeyValueSeparator).Skip(1).First().Trim() + BenchmarkClassPostfix)
             .Join(
                 collection,
                 b => b,
@@ -84,21 +28,58 @@ else if (args.Any(x => x.StartsWith("-b" + Consts.ArgumentKeyValueSeparator) || 
 
     if (runnable.Length == 0)
     {
-        PrintHeader("No matching benchmark(s) found", help);
+        PrintHeader(NoMatchingBenchmarksFoundMessage, help);
         return;
     }
 
-    RunBenchmarks(
-        "The specified benchmark(s) will commence promptly!",
-        help,
-        runnable
-    );
+    RunBenchmarks(SpecifiedBenchmarksMessage, help, runnable);
 }
 else
+    RunBenchmarks(AllBenchmarksMessage, help, collection);
+
+static (Type[] collection, string help) Assets()
 {
-    RunBenchmarks(
-        "All benchmarks will commence promptly!",
-        help,
-        collection
-    );
+    var collection =
+        Assembly
+            .GetEntryAssembly()!
+            .GetTypes()
+            .Where(x => !x.IsInterface && x.GetInterface(nameof(IBenchmark)) is { })
+            .ToArray();
+    var availableBenchmarks = new StringBuilder();
+
+    foreach (var item in collection.Select(x => x.Name[..x.Name.LastIndexOf(BenchmarkClassPostfix)]))
+    {
+        availableBenchmarks.AppendLine(item);
+    }
+
+    var help =
+@$"{WelcomeMessage}
+
+Arguments
+----------
+{ArgumentLongPrefix}help or {ArgumentPrefix}h: this help menu
+{ArgumentLongPrefix}all or {ArgumentPrefix}a : runs all
+{ArgumentLongPrefix}benchmark=<name_of_benchmark> or {ArgumentPrefix}b=<name_of_benchmark>: runs specific benchmark - multiple can be specified
+
+Available Benchmarks
+--------------------
+{availableBenchmarks}";
+
+    return (collection, help);
+}
+
+static void PrintHeader(string title, string help)
+{
+    Console.WriteLine(help);
+    Console.WriteLine(Separator);
+    Console.WriteLine(title);
+    Console.WriteLine(Separator);
+    Console.WriteLine(string.Empty);
+}
+
+static void RunBenchmarks(string title, string help, Type[] collection)
+{
+    PrintHeader(title, help);
+
+    BenchmarkRunner.Run(collection);
 }
