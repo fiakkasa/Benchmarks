@@ -1,4 +1,4 @@
-namespace Benchmarks.Strings;
+namespace Benchmarks.InOutRef;
 
 public struct PersonStruct : IPerson
 {

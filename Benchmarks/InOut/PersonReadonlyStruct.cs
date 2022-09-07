@@ -1,4 +1,4 @@
-namespace Benchmarks.Strings;
+namespace Benchmarks.InOutRef;
 
 public readonly struct PersonReadonlyStruct : IPerson
 {

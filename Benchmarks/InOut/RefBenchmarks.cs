@@ -1,27 +1,29 @@
-﻿namespace Benchmarks.InOutRef;
+namespace Benchmarks.InOutRef;
 
 [MemoryDiagnoser(false)]
 [RankColumn]
 [Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Out", "Objects", "Structs", "Records" })]
-public class OutBenchmarks : IBenchmark
+[BenchmarkCategory(new[] { "Ref", "Objects", "Structs", "Records" })]
+public class RefBenchmarks : IBenchmark
 {
-    private static void OutFn<T>(out T value, Func<T> fn)
+    private static void RefFn<T>(ref T value, Func<T> fn)
     {
         value = fn();
     }
 
     [Benchmark(Baseline = true)]
-    public void Int_Out()
+    public void Int_Ref()
     {
-        OutFn(out int value, () => 100);
+        int value = default;
+        RefFn(ref value, () => 100);
     }
 
     [Benchmark]
-    public void PersonClass_Out()
+    public void PersonClass_Ref()
     {
-        OutFn(
-            out PersonClass value,
+        PersonClass value = default!;
+        RefFn(
+            ref value,
             () => new PersonClass
             {
                 Age = 33,
@@ -32,10 +34,11 @@ public class OutBenchmarks : IBenchmark
     }
 
     [Benchmark]
-    public void PersonStruct_Out()
+    public void PersonStruct_Ref()
     {
-        OutFn(
-            out PersonStruct value,
+        PersonStruct value = default!;
+        RefFn(
+            ref value,
             () => new PersonStruct
             {
                 Age = 33,
@@ -46,46 +49,51 @@ public class OutBenchmarks : IBenchmark
     }
 
     [Benchmark]
-    public void PersonReadonlyStruct_Out()
+    public void PersonReadonlyStruct_Ref()
     {
-        OutFn(
-            out PersonReadonlyStruct value,
+        PersonReadonlyStruct value = default!;
+        RefFn(
+            ref value,
             () => new PersonReadonlyStruct(33, "John", "Doe")
         );
     }
 
     [Benchmark]
-    public void PersonPropertiesReadonlyStruct_Out()
+    public void PersonPropertiesReadonlyStruct_Ref()
     {
-        OutFn(
-            out PersonPropertiesReadonlyStruct value,
+        PersonPropertiesReadonlyStruct value = default!;
+        RefFn(
+            ref value,
             () => new PersonPropertiesReadonlyStruct(33, "John", "Doe")
         );
     }
 
     [Benchmark]
-    public void PersonRecordClass_Out()
+    public void PersonRecordClass_Ref()
     {
-        OutFn(
-            out PersonRecordClass value,
+        PersonRecordClass value = default!;
+        RefFn(
+            ref value,
             () => new PersonRecordClass(33, "John", "Doe")
         );
     }
 
     [Benchmark]
-    public void PersonRecordStruct_Out()
+    public void PersonRecordStruct_Ref()
     {
-        OutFn(
-            out PersonRecordStruct value,
+        PersonRecordStruct value = default!;
+        RefFn(
+            ref value,
             () => new PersonRecordStruct(33, "John", "Doe")
         );
     }
 
     [Benchmark]
-    public void PersonRecordClassWithInitProperties_Out()
+    public void PersonRecordClassWithInitProperties_Ref()
     {
-        OutFn(
-            out PersonRecordClassWithInitProperties value,
+        PersonRecordClassWithInitProperties value = default!;
+        RefFn(
+            ref value,
             () => new PersonRecordClassWithInitProperties
             {
                 Age = 33,
@@ -96,10 +104,11 @@ public class OutBenchmarks : IBenchmark
     }
 
     [Benchmark]
-    public void PersonRecordStructWithInitProperties_Out()
+    public void PersonRecordStructWithInitProperties_Ref()
     {
-        OutFn(
-            out PersonRecordStructWithInitProperties value,
+        PersonRecordStructWithInitProperties value = default!;
+        RefFn(
+            ref value,
             () => new PersonRecordStructWithInitProperties
             {
                 Age = 33,
@@ -110,10 +119,11 @@ public class OutBenchmarks : IBenchmark
     }
 
     [Benchmark]
-    public void PersonRecordClassWithMutableProperties_Out()
+    public void PersonRecordClassWithMutableProperties_Ref()
     {
-        OutFn(
-            out PersonRecordClassWithMutableProperties value,
+        PersonRecordClassWithMutableProperties value = default!;
+        RefFn(
+            ref value,
             () => new PersonRecordClassWithMutableProperties
             {
                 Age = 33,
@@ -124,10 +134,11 @@ public class OutBenchmarks : IBenchmark
     }
 
     [Benchmark]
-    public void PersonRecordStructWithMutableProperties_Out()
+    public void PersonRecordStructWithMutableProperties_Ref()
     {
-        OutFn(
-            out PersonRecordStructWithMutableProperties value,
+        PersonRecordStructWithMutableProperties value = default!;
+        RefFn(
+            ref value,
             () => new PersonRecordStructWithMutableProperties
             {
                 Age = 33,
