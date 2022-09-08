@@ -16,6 +16,7 @@ else if (args.Any(x => x.StartsWith(ArgumentPrefix + "b" + ArgumentKeyValueSepar
         args
             .Where(x => x.StartsWith(ArgumentPrefix + "b" + ArgumentKeyValueSeparator) || x.StartsWith(ArgumentLongPrefix + "benchmark" + ArgumentKeyValueSeparator))
             .Select(x => x.Split(ArgumentKeyValueSeparator).Skip(1).First().Trim() + BenchmarkClassPostfix)
+            .Distinct()
             .Join(
                 collection,
                 b => b,
@@ -42,6 +43,7 @@ static (Type[] collection, string help) Assets()
             .GetEntryAssembly()!
             .GetTypes()
             .Where(x => !x.IsInterface && x.GetInterface(nameof(IBenchmark)) is { })
+            .OrderBy(x => x.Name)
             .ToArray();
     var availableBenchmarks = new StringBuilder();
 
