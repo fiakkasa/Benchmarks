@@ -40,9 +40,9 @@ static (Type[] collection, string help) Assets()
 {
     var collection =
         Assembly
-            .GetEntryAssembly()!
-            .GetTypes()
-            .Where(x => !x.IsInterface && x.GetInterface(nameof(IBenchmark)) is { })
+            .GetExecutingAssembly()
+            .DefinedTypes
+            .Where(x => !x.IsInterface && !x.IsAbstract && typeof(IBenchmark).IsAssignableFrom(x))
             .OrderBy(x => x.Name)
             .ToArray();
     var availableBenchmarks = new StringBuilder();
