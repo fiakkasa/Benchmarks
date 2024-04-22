@@ -7,7 +7,7 @@ namespace Benchmarks.Commands;
 [Verb("benchmarks", aliases: ["b"], HelpText = "Benchmarks!")]
 public class BenchmarksCommand : ICommandHandler
 {
-    [Option('s', "selection", HelpText = $"Defaults to '{AllBenchmarks}'; alternatively a comma separated list can be provide with a selection of benchmarks to run.'")]
+    [Option('s', "selection", HelpText = $"Defaults to '{AllBenchmarks}'; alternatively a comma separated list can be provide with a selection of benchmarks to run.")]
     public string Option { get; set; } = AllBenchmarks;
 
     public async Task Execute()
