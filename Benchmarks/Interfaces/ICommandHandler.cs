@@ -2,5 +2,5 @@ namespace Benchmarks.Interfaces;
 
 public interface ICommandHandler
 {
-    Task Execute();
+    Task Execute(CancellationToken cancellationToken = default);
 }

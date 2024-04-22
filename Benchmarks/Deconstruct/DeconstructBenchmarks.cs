@@ -1,9 +1,6 @@
 ﻿namespace Benchmarks.Deconstruct;
 
-[MemoryDiagnoser(false)]
-[RankColumn]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Deconstruct", "Objects", "Structs", "Records" })]
+[BenchmarkCategory(["Deconstruct", "Objects", "Structs", "Records"])]
 public class DeconstructBenchmarks : IBenchmark
 {
     [Benchmark(Baseline = true)]

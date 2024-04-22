@@ -1,9 +1,6 @@
 namespace Benchmarks.InOutRef;
 
-[MemoryDiagnoser(false)]
-[RankColumn]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Ref", "Objects", "Structs", "Records" })]
+[BenchmarkCategory(["Ref", "Objects", "Structs", "Records"])]
 public class RefBenchmarks : IBenchmark
 {
     private static void RefFn<T>(ref T value, Func<T> fn)

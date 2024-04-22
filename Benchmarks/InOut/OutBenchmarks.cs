@@ -1,9 +1,6 @@
 ﻿namespace Benchmarks.InOutRef;
 
-[MemoryDiagnoser(false)]
-[RankColumn]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Out", "Objects", "Structs", "Records" })]
+[BenchmarkCategory(["Out", "Objects", "Structs", "Records"])]
 public class OutBenchmarks : IBenchmark
 {
     private static void OutFn<T>(out T value, Func<T> fn)

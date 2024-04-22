@@ -1,13 +1,10 @@
 ﻿namespace Benchmarks.Strings;
 
-[MemoryDiagnoser(false)]
-[RankColumn]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Strings", "Scalars", "StringConcatenation" })]
+[BenchmarkCategory(["Strings", "Scalars", "StringConcatenation"])]
 public class StringConcatenationBenchmarks : IBenchmark
 {
-    private readonly string[] _collection = new[]
-    {
+    private readonly string[] _collection =
+    [
         "hello",
         "world",
         "lorem",
@@ -18,7 +15,7 @@ public class StringConcatenationBenchmarks : IBenchmark
         "lasagna",
         "red",
         "blue"
-    };
+    ];
 
     [Benchmark(Baseline = true)]
     public string Concatenate_Using_Plus()

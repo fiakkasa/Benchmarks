@@ -6,7 +6,7 @@ namespace Benchmarks.Commands;
 [Verb("info", isDefault: true, aliases: ["i"], HelpText = "Info!")]
 public class InfoCommand : ICommandHandler
 {
-    public Task Execute()
+    public async Task Execute(CancellationToken cancellationToken = default) => await Task.Run(() =>
     {
         var collection = Common.AvailableBenchmarks();
 
@@ -31,7 +31,5 @@ Available Benchmarks
 {availableBenchmarks}";
 
         Console.WriteLine(info);
-
-        return Task.CompletedTask;
-    }
+    }, cancellationToken);
 }
