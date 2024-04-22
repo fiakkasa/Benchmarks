@@ -1,24 +1,24 @@
-using System.Linq;
 namespace Benchmarks.Collections;
 
-[MemoryDiagnoser(false)]
 [ThreadingDiagnoser]
-[RankColumn]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Collections", "Sorting", "Concurrency", "Parallelism" })]
+[BenchmarkCategory(["Collections", "Sorting", "Concurrency", "Parallelism"])]
 public class SortingIntegersBenchmarks : IBenchmark
 {
     public static IEnumerable<CollectionContainer<int>> GetIntCollection()
     {
-        yield return new(Enumerable.Empty<int>());
+        yield return new([]);
 
-        yield return new(Enumerable
-            .Range(0, 10)
-            .Select(_ => Random.Shared.Next()));
+        yield return new(
+            Enumerable
+                .Range(0, 10)
+                .Select(_ => Random.Shared.Next())
+        );
 
-        yield return new(Enumerable
-            .Range(0, 1000)
-            .Select(_ => Random.Shared.Next()));
+        yield return new(
+            Enumerable
+                .Range(0, 1000)
+                .Select(_ => Random.Shared.Next())
+        );
     }
 
     [Benchmark(Baseline = true)]

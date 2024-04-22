@@ -1,6 +1,6 @@
 namespace Benchmarks.InOutRef;
 
-public record struct PersonRecordStructWithInitProperties : IPerson
+public readonly record struct PersonRecordStructWithInitProperties : IPerson
 {
     public int Age { get; init; }
     public string FirstName { get; init; }

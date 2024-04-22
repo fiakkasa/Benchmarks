@@ -3,11 +3,8 @@ using System.Security.Cryptography;
 
 namespace Benchmarks.Collections;
 
-[MemoryDiagnoser(false)]
 [ThreadingDiagnoser]
-[RankColumn]
-[Orderer(SummaryOrderPolicy.FastestToSlowest)]
-[BenchmarkCategory(new[] { "Collections", "Tasks", "Concurrency", "Parallelism" })]
+[BenchmarkCategory(["Collections", "Tasks", "Concurrency", "Parallelism"])]
 public class TasksWithDelayCollectionBenchmarks : IBenchmark
 {
     private const int _chunkSize = 4;
