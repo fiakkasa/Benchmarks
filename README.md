@@ -1,21 +1,33 @@
 # Benchmarks
 
-```powershell
-Arguments
-----------
---help or -h : this help menu
---all or -a : runs all
---benchmark=<name_of_benchmark> or -b=<name_of_benchmark>: runs specific benchmark - multiple can specified
+| Arguments     | Description                                     |
+| ------------- | ----------------------------------------------- |
+| info, i       | Info!                                           |
+| benchmarks, b | Benchmarks!                                     |
+| help          | Display more information on a specific command. |
+| version       | Display version information.                    |
 
 Available Benchmarks
---------------------
-TasksCollection
-TasksWithDelayCollection
-Deconstruct
-```
+
+- Deconstruct
+- In
+- Out
+- Ref
+- SortingIntegers
+- StringConcatenation
+- TasksCollection
+- TasksWithDelayCollection
 
 ex.
 
+Running all benchmarks:
+
 ```powershell
-dotnet run -c Release -- --all
+dotnet run -c Release -- benchmarks
+```
+
+Running specific benchmarks:
+
+```powershell
+dotnet run -c Release -- benchmarks --selection Deconstruct,In,Out
 ```
